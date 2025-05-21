@@ -16,3 +16,7 @@ Initialize a VScode tunnel and private `code` LMOD module to connect to compute 
    ```
 5. Open VScode and connect to the tunnel using GitHub Authentication
 6. Once finished, disconnect from the tunnel and cancel the job on the cluster using `scancel {JOB_ID}`
+
+## Credit
+
+This process was derived from Harvards FASRC "[VSCode Remote Development via SSH and Tunnel](https://docs.rc.fas.harvard.edu/kb/vscode-remote-development-via-ssh-or-tunnel/)"
