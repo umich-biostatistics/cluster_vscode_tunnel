@@ -25,13 +25,9 @@ fi
 SW="$HOME/software"
 mkdir -p $SW/vscode
 
-# Check if code executable exists, if not, go get it
-if [ -e $SW/vscode/code ]; then
-    echo "code program already exists, continuing..."
-else
-    echo "Downloading vscode..."
-    curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' | tar -C $SW/vscode -xzf -
-fi
+# Download latest version of vscode
+echo "Downloading vscode..."
+curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' | tar -C $SW/vscode -xzf -
 
 # Load private vscode module
 ml vscode
