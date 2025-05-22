@@ -1,6 +1,6 @@
 # VScode Tunnel to Great Lakes Compute Node
 
-Initialize a VScode tunnel using GitHub and create a private `code` LMOD module to connect to compute nodes using Great Lakes. 
+Initialize a VScode tunnel using GitHub and create a private `vscode` LMOD module to connect to compute nodes using Great Lakes. 
 The `vscode_tunnel.sh` script can be submitted to sbatch with the deisred resources to connect to a compute node and start the tunnel.
 
 ## Usage
