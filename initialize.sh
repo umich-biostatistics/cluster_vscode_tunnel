@@ -1,6 +1,32 @@
 #!/bin/bash
 
 set -o errexit -o nounset -o pipefail
+ 
+# Default provider
+PROVIDER="github"
+
+# Parse command-line options for provider
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -gh|--github)
+      PROVIDER="github"
+      shift
+      ;;
+    -ms|--microsoft)
+      PROVIDER="microsoft"
+      shift
+      ;;
+    -h|--help)
+      echo "Usage: $0 [-gh|--github] [-ms|--microsoft]"
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1"
+      echo "Usage: $0 [-gh|--github] [-ms|--microsoft]"
+      exit 1
+      ;;
+  esac
+done
 
 # Create private module directory and use
 mkdir -p $HOME/Lmod/vscode
@@ -40,5 +66,5 @@ curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-
 # Load private vscode module
 ml vscode
 
-# Initialize code tunnel using github or microsoft, comment/uncomment as needed
-VSCODE_CLI_USE_FILE_KEYCHAIN=1 VSCODE_CLI_DISABLE_KEYCHAIN_ENCRYPT=1 code tunnel user login --provider github
+# Initialize code tunnel using selected provider
+VSCODE_CLI_USE_FILE_KEYCHAIN=1 VSCODE_CLI_DISABLE_KEYCHAIN_ENCRYPT=1 code tunnel user login --provider "$PROVIDER"
