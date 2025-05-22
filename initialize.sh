@@ -15,13 +15,25 @@ if [ -a $HOME/Lmod/vscode/vscode.lua ]; then
     echo "LMOD file exists, continuing..."
 else
     echo "Creating private module for VScode..."
-    cat >> ~/Lmod/vscode/vscode.lua << "END"
+    cat > ~/Lmod/vscode/vscode.lua << "END"
+-- Help
+help([[
+VScode CLI tool, used for --tunnel functionality to create a tunnel via GitHub or Microsoft and connect to a compute node from a local VScode instance.
+
+See GitHub repo for example batch script: https://github.com/umich-biostatistics/cluster_vscode_tunnel
+]])
+
 -- local variables to be used inside the module file
 local app          = myModuleName()
 local installDir   = pathJoin("~/software", app)
 
 -- general system variables
 prepend_path('PATH',       pathJoin(installDir))
+
+whatis("Name: VScode")
+whatis("Description: VScode CLI tool for creating tunnels")
+whatis("Package documentation: https://code.visualstudio.com/docs/configure/command-line")
+whatis("GitHub: https://github.com/umich-biostatistics/cluster_vscode_tunnel")
 END
 fi
 
