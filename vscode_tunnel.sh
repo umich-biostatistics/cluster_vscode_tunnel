@@ -13,7 +13,7 @@ set -o errexit -o nounset -o pipefail
 export VSCODE_CLI_USE_FILE_KEYCHAIN=1 
 export VSCODE_CLI_DISABLE_KEYCHAIN_ENCRYPT=1 
 
-ml use ~/Lmode
+ml use ~/Lmod
 ml vscode
 
 # Auto-accept the license terms & launch the tunnel
