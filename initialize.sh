@@ -2,15 +2,19 @@
 
 set -o errexit -o nounset -o pipefail
 
-# Load private modules
-ml use.own
+# Create private module directory and use
+mkdir -p $HOME/Lmod/vscode
+ml use $HOME/Lmod
 
-mkdir -p ~/Lmod/vscode
+# Set and create local software directory
+SW="$HOME/software"
+mkdir -p $SW/vscode
 
 # Create private vscode module
-if [ -a ~/Lmod/vscode/vscode.lua ]; then
+if [ -a $HOME/Lmod/vscode/vscode.lua ]; then
     echo "LMOD file exists, continuing..."
 else
+    echo "Creating private module for VScode..."
     cat >> ~/Lmod/vscode/vscode.lua << "END"
 -- local variables to be used inside the module file
 local app          = myModuleName()
@@ -21,12 +25,8 @@ prepend_path('PATH',       pathJoin(installDir))
 END
 fi
 
-# Set and create local software directory
-SW="$HOME/software"
-mkdir -p $SW/vscode
-
 # Download latest version of vscode
-echo "Downloading vscode..."
+echo "Downloading vscode to $SW/vscode ..."
 curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' | tar -C $SW/vscode -xzf -
 
 # Load private vscode module
