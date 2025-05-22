@@ -11,11 +11,8 @@ SW="$HOME/software"
 mkdir -p $SW/vscode
 
 # Create private vscode module
-if [ -a $HOME/Lmod/vscode/vscode.lua ]; then
-    echo "LMOD file exists, continuing..."
-else
-    echo "Creating private module for VScode..."
-    cat > ~/Lmod/vscode/vscode.lua << "END"
+echo "Creating private module for VScode..."
+cat > ~/Lmod/vscode/vscode.lua << "END"
 -- Help
 help([[
 VScode CLI tool, used for --tunnel functionality to create a tunnel via GitHub or Microsoft and connect to a compute node from a local VScode instance.
@@ -35,7 +32,6 @@ whatis("Description: VScode CLI tool for creating tunnels")
 whatis("Package documentation: https://code.visualstudio.com/docs/configure/command-line")
 whatis("GitHub: https://github.com/umich-biostatistics/cluster_vscode_tunnel")
 END
-fi
 
 # Download latest version of vscode
 echo "Downloading vscode to $SW/vscode ..."
