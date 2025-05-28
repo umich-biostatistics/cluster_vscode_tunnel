@@ -24,4 +24,4 @@ The `vscode_tunnel.sh` script can be submitted to sbatch with the deisred resour
 
 ## Credit
 
-This process was derived from Harvards FASRC "[VSCode Remote Development via SSH and Tunnel](https://docs.rc.fas.harvard.edu/kb/vscode-remote-development-via-ssh-or-tunnel/)"
+This process was derived from Harvard's FASRC "[VSCode Remote Development via SSH and Tunnel](https://docs.rc.fas.harvard.edu/kb/vscode-remote-development-via-ssh-or-tunnel/)"
