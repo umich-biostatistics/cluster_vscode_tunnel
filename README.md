@@ -1,6 +1,6 @@
 # VScode Tunnel to Great Lakes Compute Node
 
-Initialize a VScode tunnel using GitHub or Microsoft and create a private `vscode` LMOD module to connect to Great Lakes compute nodes.
+This repo contains two scripts that assist with creating a private LMOD module for the vscode cli tool and initializing a remote tunnel using GitHub or Microsoft authentication on a SLURM cluster.
 The `vscode_tunnel.sh` script can be submitted to sbatch with the deisred resources to connect to a compute node and start the tunnel.
 
 ## Usage
