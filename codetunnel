@@ -244,13 +244,14 @@ if JOB_ID=$(sbatch "$TEMP_SCRIPT" 2>&1); then
     echo ""
     print_info "Useful commands:"
     echo "  Check job status: squeue -j $JOB_ID"
-    echo "  View log file: tail -f $SCRIPT_DIR/logs/${JOB_NAME}-${JOB_ID}.out"
+    echo "  Follow log file: tail -f $SCRIPT_DIR/logs/${JOB_NAME}-${JOB_ID}.out"
     echo "  Cancel job: scancel $JOB_ID"
     
     echo ""
     print_warning "Wait for the job to start, then check the log file for the tunnel URL."
     print_info "Once the tunnel is active, you can connect using VSCode on your local machine."
-    
+    print_warning "Don't forget to cancel the job when you're done!"
+
 else
     print_error "Failed to submit job: $JOB_ID"
     rm -f "$TEMP_SCRIPT"
@@ -262,3 +263,5 @@ rm -f "$TEMP_SCRIPT"
 
 echo ""
 print_success "codetunnel completed successfully!"
+print_warning "Don't forget to cancel the job when you're done!
+If you don't, your job will continue running in the background and continue to incur charges."
