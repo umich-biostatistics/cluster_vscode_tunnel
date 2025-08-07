@@ -226,7 +226,7 @@ fi
 cat >> "$TEMP_SCRIPT" << EOF
 
 # Auto-accept the license terms & launch the tunnel
-code tunnel --accept-server-license-terms --name $(hostname -s)
+code tunnel --accept-server-license-terms --name \$(hostname -s)
 EOF
 
 # Submit the job
