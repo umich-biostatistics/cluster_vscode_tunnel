@@ -10,6 +10,11 @@ This repo contains scripts that assist with creating a private LMOD module for t
 
 ## Usage
 
+> [!NOTE]
+> The initialization script only needs to be run once to setup the module and authentication method for the tunnel.
+> 
+> Subsequent connections can be made by loading the module and using `codetunnel` or the `vscode_tunnel.sh` script.
+
 ### Option 1: Interactive Helper (Recommended)
 
 Use the `codetunnel` helper script to interactively submit a SLURM job that sets up a VSCode tunnel on a compute node. The script validates your inputs, builds a temporary batch file, submits the job, and prints useful follow-up commands.
@@ -30,6 +35,7 @@ Use the `codetunnel` helper script to interactively submit a SLURM job that sets
 3. After initialization, load the custom module and launch the interactive helper:
 
    ```bash
+   ml use.own
    ml vscode
    codetunnel
    ```
@@ -95,13 +101,13 @@ Additional modules (optional): cuda/11.2
 
 Follow steps 1 & 2 as described in Option 1.
 
-1. **UPDATE THE ACCOUNT DIRECTIVE** in `vscode_tunnel.sh` and submit via sbatch
+1. **UPDATE THE ACCOUNT DIRECTIVE** and any allocation directives in `vscode_tunnel.sh` and submit via sbatch
 
    ```bash
    sbatch vscode_tunnel.sh
    ```
 
-2. Open VScode on your local machine and connect to the tunnel using GitHub Authentication
+2. Open VScode on your local machine and connect to the tunnel using the authentication method chosen during the initialization step.
 
 3. Once finished, disconnect from the tunnel and cancel the job on the cluster using `scancel {JOB_ID}`
 
