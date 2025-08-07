@@ -153,6 +153,9 @@ JOB_NAME=${JOB_NAME:-vscode_tunnel}
 # Additional SBATCH options
 read -p "Additional SBATCH options (optional): " ADDITIONAL_OPTIONS
 
+# Additional modules to load
+read -p "Additional modules to load (optional, space-separated): " ADDITIONAL_MODULES
+
 echo ""
 print_info "Job configuration summary:"
 echo "  Account: $ACCOUNT"
@@ -166,6 +169,9 @@ echo "  Time: $TIME"
 echo "  Job name: $JOB_NAME"
 if [ -n "$ADDITIONAL_OPTIONS" ]; then
     echo "  Additional options: $ADDITIONAL_OPTIONS"
+fi
+if [ -n "$ADDITIONAL_MODULES" ]; then
+    echo "  Additional modules: $ADDITIONAL_MODULES"
 fi
 
 echo ""
@@ -206,7 +212,22 @@ fi
 
 # Add the main script content (excluding the original SBATCH directives)
 echo "" >> "$TEMP_SCRIPT"
-sed '/^#SBATCH/d' "$VSCODE_SCRIPT" | tail -n +2 >> "$TEMP_SCRIPT"
+cat >> "$TEMP_SCRIPT" << EOF
+ml use ~/Lmod
+ml vscode
+EOF
+
+# Add additional modules if specified
+if [ -n "$ADDITIONAL_MODULES" ]; then
+    echo "ml $ADDITIONAL_MODULES" >> "$TEMP_SCRIPT"
+    echo "" >> "$TEMP_SCRIPT"
+fi
+
+cat >> "$TEMP_SCRIPT" << EOF
+
+# Auto-accept the license terms & launch the tunnel
+code tunnel --accept-server-license-terms --name $(hostname -s)
+EOF
 
 # Submit the job
 print_info "Submitting job..."
