@@ -16,5 +16,8 @@ export VSCODE_CLI_DISABLE_KEYCHAIN_ENCRYPT=1
 ml use ~/Lmod
 ml vscode
 
+# To update vscode before each job, uncomment the following line
+# SW="$HOME/software" && curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' | tar -C $SW/vscode -xzf -
+
 # Auto-accept the license terms & launch the tunnel
 code tunnel --accept-server-license-terms --name $(hostname -s)
