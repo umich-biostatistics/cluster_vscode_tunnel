@@ -207,7 +207,7 @@ fi
 
 # Add additional options if specified
 if [ -n "$ADDITIONAL_OPTIONS" ]; then
-    echo #SBATCH "$ADDITIONAL_OPTIONS" >> "$TEMP_SCRIPT"
+    echo "#SBATCH $ADDITIONAL_OPTIONS" >> "$TEMP_SCRIPT"
 fi
 
 # Add the main script content (excluding the original SBATCH directives)
