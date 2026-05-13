@@ -151,7 +151,7 @@ read -p "Job name [vscode_tunnel]: " JOB_NAME
 JOB_NAME=${JOB_NAME:-vscode_tunnel}
 
 # Additional SBATCH options
-read -p "Additional SBATCH options (optional): " ADDITIONAL_OPTIONS
+read -p "Additional SBATCH options (optional, space-separated): " ADDITIONAL_OPTIONS
 
 # Additional modules to load
 read -p "Additional modules to load (optional, space-separated): " ADDITIONAL_MODULES
@@ -207,7 +207,7 @@ fi
 
 # Add additional options if specified
 if [ -n "$ADDITIONAL_OPTIONS" ]; then
-    echo "$ADDITIONAL_OPTIONS" >> "$TEMP_SCRIPT"
+    echo #SBATCH "$ADDITIONAL_OPTIONS" >> "$TEMP_SCRIPT"
 fi
 
 # Add the main script content (excluding the original SBATCH directives)
