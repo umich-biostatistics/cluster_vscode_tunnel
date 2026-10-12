@@ -226,7 +226,7 @@ fi
 cat >> "$TEMP_SCRIPT" << EOF
 
 # Auto-accept the license terms & launch the tunnel
-code tunnel --accept-server-license-terms --name \$(hostname -s)
+VSCODE_CLI_USE_FILE_KEYCHAIN=1 VSCODE_CLI_DISABLE_KEYCHAIN_ENCRYPT=1 code tunnel --accept-server-license-terms --name \$(hostname -s)
 EOF
 
 # Submit the job
