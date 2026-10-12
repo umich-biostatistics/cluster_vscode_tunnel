@@ -77,6 +77,140 @@ get_script_dir() {
     echo "$(cd -P "$(dirname "$source")" >/dev/null 2>&1 && pwd)"
 }
 
+# VSCode CLI update support
+CLI_PLATFORM="cli-alpine-x64"
+UPDATE_API="https://update.code.visualstudio.com/api/update/$CLI_PLATFORM/stable/latest"
+UPDATE_CHECK_INTERVAL_DAYS=7
+
+# Directory holding the installed `code` binary (and the update-check cache)
+get_install_dir() {
+    local code_path
+    code_path="$(command -v code 2>/dev/null || true)"
+    if [ -n "$code_path" ]; then
+        dirname "$code_path"
+    else
+        echo "$HOME/software/vscode"
+    fi
+}
+
+# Commit hash of the installed CLI, parsed from "code 1.120.0 (commit <hash>)"
+get_local_commit() {
+    code --version 2>/dev/null | grep --color=never -oE '[0-9a-f]{40}' | head -n 1 || true
+}
+
+# Extract a string field from the (flat) update API JSON: json_field <key> <json>
+json_field() {
+    grep --color=never -oE "\"$1\":\"[^\"]*\"" <<< "$2" | head -n 1 | cut -d'"' -f4 || true
+}
+
+# Print a one-line notice if a newer CLI exists. Queries the update API at most
+# once every UPDATE_CHECK_INTERVAL_DAYS days; never blocks and fails silently.
+check_for_update() {
+    if [ -n "${CODETUNNEL_NO_UPDATE_CHECK:-}" ]; then
+        return 0
+    fi
+
+    local cache latest_commit latest_version info local_commit
+    cache="$(get_install_dir)/.codetunnel_update_check"
+
+    if [ -n "$(find "$cache" -mtime "-$UPDATE_CHECK_INTERVAL_DAYS" 2>/dev/null)" ]; then
+        read -r latest_commit latest_version < "$cache" || true
+    else
+        info="$(curl -fsS -m 3 "$UPDATE_API" 2>/dev/null)" || return 0
+        latest_commit="$(json_field version "$info")"
+        latest_version="$(json_field productVersion "$info")"
+        if [ -z "$latest_commit" ]; then
+            return 0
+        fi
+        echo "$latest_commit $latest_version" > "$cache" 2>/dev/null || true
+    fi
+
+    local_commit="$(get_local_commit)"
+    if [ -n "$local_commit" ] && [ -n "${latest_commit:-}" ] && [ "$local_commit" != "$latest_commit" ]; then
+        print_info "A newer VSCode CLI is available (${latest_version:-unknown}). Run: codetunnel --update"
+        echo ""
+    fi
+}
+
+# Download the latest CLI, verify its checksum, and replace the installed binary
+update_cli() {
+    local install_dir info url sha256 latest_commit latest_version local_commit tmpdir
+    install_dir="$(get_install_dir)"
+
+    print_info "Checking for the latest VSCode CLI..."
+    if ! info="$(curl -fsS -m 10 "$UPDATE_API")"; then
+        print_error "Could not reach the VSCode update service."
+        exit 1
+    fi
+    latest_commit="$(json_field version "$info")"
+    latest_version="$(json_field productVersion "$info")"
+    url="$(json_field url "$info")"
+    sha256="$(json_field sha256hash "$info")"
+    if [ -z "$latest_commit" ] || [ -z "$url" ] || [ -z "$sha256" ]; then
+        print_error "Unexpected response from the VSCode update service."
+        exit 1
+    fi
+
+    local_commit="$(get_local_commit)"
+    echo "  Installed: $(code --version 2>/dev/null | head -n 1 || echo unknown)"
+    echo "  Latest:    $latest_version (commit $latest_commit)"
+    if [ "$local_commit" = "$latest_commit" ]; then
+        print_success "VSCode CLI is already up to date."
+        exit 0
+    fi
+
+    # Stage inside the install dir so the final mv is an atomic same-filesystem
+    # rename; this also works while a running tunnel has the old binary open.
+    tmpdir="$(mktemp -d "$install_dir/.update.XXXXXX")"
+    # Expand now: $tmpdir is local and out of scope by the time the trap fires
+    trap "rm -rf '$tmpdir'" EXIT
+
+    print_info "Downloading $latest_version..."
+    curl -fSL -o "$tmpdir/cli.tar.gz" "$url"
+    if ! echo "$sha256  $tmpdir/cli.tar.gz" | sha256sum -c --status; then
+        print_error "Checksum mismatch; not updating."
+        exit 1
+    fi
+
+    tar -C "$tmpdir" -xzf "$tmpdir/cli.tar.gz"
+    if [ ! -f "$tmpdir/code" ]; then
+        print_error "Downloaded archive did not contain a 'code' binary; not updating."
+        exit 1
+    fi
+    chmod +x "$tmpdir/code"
+    mv -f "$tmpdir/code" "$install_dir/code"
+
+    echo "$latest_commit $latest_version" > "$install_dir/.codetunnel_update_check" 2>/dev/null || true
+    print_success "Updated VSCode CLI to $latest_version."
+    print_info "Running tunnel jobs keep the old version until they are resubmitted."
+}
+
+print_usage() {
+    echo "Usage: codetunnel [--update]"
+    echo "  (no options)  Interactively submit a VSCode tunnel job"
+    echo "  --update      Update the VSCode CLI to the latest stable release"
+    echo ""
+    echo "Set CODETUNNEL_NO_UPDATE_CHECK=1 to disable the weekly update notice."
+}
+
+case "${1:-}" in
+    --update)
+        update_cli
+        exit 0
+        ;;
+    -h|--help)
+        print_usage
+        exit 0
+        ;;
+    "")
+        ;;
+    *)
+        print_error "Unknown option: $1"
+        print_usage
+        exit 1
+        ;;
+esac
+
 # Check if vscode_tunnel.sh exists in the same directory
 SCRIPT_DIR=$(get_script_dir)
 VSCODE_SCRIPT="$SCRIPT_DIR/vscode_tunnel.sh"
@@ -86,6 +220,8 @@ if [ ! -f "$VSCODE_SCRIPT" ]; then
     print_info "Please ensure codetunnel and vscode_tunnel.sh are in the same directory."
     exit 1
 fi
+
+check_for_update
 
 # Display banner
 echo -e "${BLUE}"

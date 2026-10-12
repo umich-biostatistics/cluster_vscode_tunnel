@@ -111,9 +111,35 @@ Follow steps 1 & 2 as described in Option 1.
 
 3. Once finished, disconnect from the tunnel and cancel the job on the cluster using `scancel {JOB_ID}`
 
+## Updating
+
+### Updating the VSCode CLI
+
+`codetunnel` checks for a newer VSCode CLI at most once a week and prints a one-line notice if one is available. It never updates on its own. To update:
+
+```bash
+ml vscode
+codetunnel --update
+```
+
+This downloads the latest stable CLI, verifies its checksum, and replaces `code` in `~/software/vscode`. Your login is kept, so there is no need to re-run `initialize.sh`. Tunnel jobs that are already running keep the old version until you resubmit them.
+
+To silence the weekly notice, set `CODETUNNEL_NO_UPDATE_CHECK=1` (for example in your `~/.bashrc`).
+
+### Updating these scripts
+
+`codetunnel` is installed as a copy, so changes to this repo do not take effect until you re-install it:
+
+```bash
+cd cluster_vscode_tunnel
+git pull
+./initialize.sh
+```
+
 ## Features
 
 - **Interactive job submission** with parameter validation
+- **One-command CLI updates** with a non-intrusive weekly update notice
 - **Colored output** for better user experience
 - **Automatic log directory creation**
 - **Job status monitoring commands** provided after submission
